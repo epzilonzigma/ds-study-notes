@@ -6,3 +6,5 @@ Implementations of recommendation systems.
 
 - Simple collaborative filtering
 - Matrix factorization
+    - Singular value decomposition (SVD)
+    - Alternating least squares (ALS)

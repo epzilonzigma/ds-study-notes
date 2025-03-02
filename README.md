@@ -1,10 +1,3 @@
-# Recommendations
+# Data Science Study Notes
 
-Implementations of recommendation systems.
-
-## Outline
-
-- Simple collaborative filtering
-- Matrix factorization
-    - Singular value decomposition (SVD)
-    - Alternating least squares (ALS)
+My notes for organizing my thoughts and studies in data science and machine learning

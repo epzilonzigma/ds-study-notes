@@ -53,7 +53,7 @@ class DualNumber:
         new_grad = self.grad - other.grad
         return DualNumber(new_value, new_grad)
     
-    def __str__(self):
+    def __repr__(self):
         return str({
             "value": self.value,
             "derivative": self.grad

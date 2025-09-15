@@ -3,6 +3,8 @@ Implementation of auto differentiation forward mode using Python
 
 Based on MIT Open Courseware: 
 https://ocw.mit.edu/courses/18-s096-matrix-calculus-for-machine-learning-and-beyond-january-iap-2023/
+
+In forward mode, the derivative is calculated along with forward pass of the function
 """
 import numpy as np
 import math
@@ -12,47 +14,49 @@ class DualNumber:
     Dual number class which contains 2 attributes:
     1. value = value of the number
     2. derivative = derivative of the function evaluated at the given number
-    """
-    def __init__(self, value, derivative = 1):
-        self.value = value
-        self.derivative = derivative
 
-    def __add__(self, dual_number):
+    the reverse operations (ex. __radd__) are spared as it adds little insight to the implementation
+    """
+    def __init__(self, value, grad = 1):
+        self.value = value
+        self.grad = grad
+
+    def __add__(self, other):
         """
         Apply additional rule to derivative
         """
-        new_value = self.value + dual_number.value
-        new_derivative = self.derivative + dual_number.derivative
-        return DualNumber(new_value, new_derivative)
+        new_value = self.value + other.value
+        new_grad = self.grad + other.grad
+        return DualNumber(new_value, new_grad)
 
-    def __mul__(self, dual_number):
+    def __mul__(self, other):
         """
         Apply multiplication rule to derivative
         """
-        new_value = self.value * dual_number.value
-        new_derivative = self.value * dual_number.derivative + self.derivative * dual_number.derivative
-        return DualNumber(new_value, new_derivative)
+        new_value = self.value * other.value
+        new_grad = self.value * other.grad + self.grad * other.grad
+        return DualNumber(new_value, new_grad)
 
-    def __div__(self, dual_number):
+    def __div__(self, other):
         """
         Apply division rule to derivative
         """
-        new_value = self.value / dual_number.value
-        new_derivative = (dual_number.value * self.derivative + self.value * dual_number.derivative)/dual_number.value ** 2
-        return DualNumber(new_value, new_derivative)
+        new_value = self.value / other.value
+        new_grad = (other.value * self.grad + self.value * other.grad)/other.value ** 2
+        return DualNumber(new_value, new_grad)
 
-    def __sub__(self, dual_number):
+    def __sub__(self, other):
         """
         Apply subtraction rule to derivative
         """
-        new_value = self.value - dual_number.value
-        new_derivative = self.derivative - dual_number.derivative
-        return DualNumber(new_value, new_derivative)
+        new_value = self.value - other.value
+        new_grad = self.grad - other.grad
+        return DualNumber(new_value, new_grad)
     
     def __str__(self):
         return str({
             "value": self.value,
-            "derivative": self.derivative
+            "derivative": self.grad
         })
 
 
@@ -77,7 +81,7 @@ def power(x: DualNumber, order: int = 1) -> DualNumber:
     """
     value = x.value**order
     derivative = order*(x.value**(order-1))
-    return DualNumber(value, derivative * x.derivative) #for chain rule
+    return DualNumber(value, derivative * x.grad) #for chain rule
 
 
 def sin(x: DualNumber) -> DualNumber:
@@ -86,7 +90,7 @@ def sin(x: DualNumber) -> DualNumber:
     """
     value = np.sin(x.value)
     derivative = np.cos(x.value)
-    return DualNumber(value, derivative * x.derivative) #for chain rule
+    return DualNumber(value, derivative * x.grad) #for chain rule
 
 
 def exp(x: DualNumber) -> DualNumber:
@@ -95,12 +99,12 @@ def exp(x: DualNumber) -> DualNumber:
     """
     value = math.exp(x.value)
     derivative = math.exp(x.value)
-    return DualNumber(value, derivative * x.derivative) #for chain rule
+    return DualNumber(value, derivative * x.grad) #for chain rule
 
 
 if __name__=="__main__":
-    # Test implement f(x) = x^3 + sin (x^2)
-    # f'(x) = 3x^2 + 2x*cos(x^2)
+    print("Test implement f(x) = x^3 + sin (x^2)")
+    print("f'(x) = 3x^2 + 2x*cos(x^2)")
 
     # Auto-differention version
     x = DualNumber(3)
@@ -112,9 +116,3 @@ if __name__=="__main__":
     y_prime = 3*(x**2) + (2*x)*np.cos(x**2)
     print(f"value: {y}")
     print(f"derivative: {y_prime}")
-
-
-    # test linear function
-    x = DualNumber(3)
-    y = power(x, 0)
-    print(y)
